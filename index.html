@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+		<title>Rookkeeper</title>
+		<meta name="description" content="An online scorekeeper for the card game Rook." />
+		<meta name="author" content="Friend" />
+
+		<link rel="shortcut icon" href="favicon.ico" />
+		
+		<link rel="stylesheet" href='bootstrap/css/bootstrap.custom.css.min' />
+		<link rel='stylesheet' href='fontawesome/css/font-awesome.min.css' />
+		<!-- <link rel='stylesheet' href='styles/stylesheet.css' /> -->
+		<link rel='stylesheet' href='styles/stylesheet.min.css' />
+		
+		<!--[if lt IE 9]>
+			<script type='text/javascript'>
+				window.location = 'oldbrowser.html';
+			</script>
+		<![endif]-->
+		
+		<script src='jquery-ui-1.10.2.custom/js/jquery-1.9.1.js'></script>
+		<script src='jquery-ui-1.10.2.custom/js/jquery-ui-1.10.2.custom.min.js'></script>
+		<script src='bootstrap/js/bootstrap.min.js'></script>
+		<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+		<script type="text/javascript">
+	     	window.chartsAreReady = false;
+	     	google.load("visualization", "1", {packages:["corechart"]});
+	      	google.setOnLoadCallback(function() {
+	      		window.chartsAreReady = true;
+	      	});
+	    </script>
+	    
+	    <!-- <script type='text/javascript' src='scripts/init.js'></script>
+	    <script type='text/javascript' src='scripts/functions.js'></script> -->
+	    
+	    <script type='text/javascript' src='scripts/init.min.js'></script>
+	    <script type='text/javascript' src='scripts/functions.min.js'></script>
+	    
+	</head>
+	<body>
+		<div class='container save-load-container'>
+			<i id='save' class='icon-save tooltipped' data-placement="bottom" title="Save this game"></i>
+			<i id='load' class='icon-folder-open-alt tooltipped' data-placement="bottom" title="Load an existing game"></i>
+			<i id='stats' class='icon-bar-chart tooltipped' data-placement="bottom" title="View game statistics"></i>
+		</div>
+		<div class='container' style='text-align: center'>
+			<h1 id='alert-title-container'>Rookkeeper</h1>
+			<hr />
+			<div class='row'>
+				<div class='span4'>
+					<h2 class='editable' id="team-1-name">Team 1</h2>
+				</div>
+				<div class='span4'>
+					<h3 style='color: grey'>bid</h3>
+				</div>
+				<div class='span4'>
+					<h2 class='editable' id="team-2-name">Team 2</h2>
+				</div>
+			</div>
+			
+			<div class='round-container'></div>
+			<div class='row' style='padding-top: 10px;'>
+				<strong>
+					<div class='span4' id='left-score' style='font-size: 1.8em; padding-top: 10px;'>0</div>
+					<div class='span4' id='add-round-button-container'>
+						<div id='add-round-button' class='btn btn-large'>
+							<i class='icon-plus-sign' style='font-size: 1.5em;'></i>
+							<span style='position: relative; top: -3px'>&nbsp;&nbsp;&nbsp;&nbsp;Add a round</span>
+						</div>
+					</div>
+					<div class='span4' id='right-score' style='font-size: 1.8em; padding-top: 10px;'>0</div>
+				</strong>
+			</div>
+			<div class='row' id='footer-spacer'></div>
+			
+			<!-- modals -->
+			<div id="save-modal" class="modal hide fade" tabindex="-1" role="dialog">
+			  	<div class="modal-header">
+			    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			    	<h3>Save game</h3>
+			  	</div>
+			  	<div class="modal-body">
+			    	Please name your game:
+			    	<input id='save-game-name' class='initial-focus' enter-target='#save-game-button'/>
+			  	</div>
+			  	<p id='duplicate-name-warning' style='display: none;'>That name is already in use.  Please choose another name.</p>
+			  	<div class="modal-footer">
+			    	<button class="btn" data-dismiss="modal">Cancel</button>
+			    	<button id="save-game-button" class="btn btn-primary">Save game</button>
+			  	</div>
+			</div>
+			
+			<div id="load-modal" class="modal hide fade" tabindex="-1" role="dialog">
+			  	<div class="modal-header">
+			    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			    	<h3>Load game</h3>
+			  	</div>
+			  	<div class="modal-body">
+			    	Game to load:
+			    	<input id='load-game-name' class='initial-focus' enter-target='#load-game-button'/>
+			  	</div>
+			  	<p id='game-does-not-exist-warning' style='display: none;'>No game with that name was found.</p>
+			  	<div class="modal-footer">
+			    	<button class="btn" data-dismiss="modal">Cancel</button>
+			    	<button id="load-game-button" class="btn btn-primary">Load game</button>
+			  	</div>
+			</div>
+			
+			<div id="error-modal" class="modal hide fade" tabindex="-1" role="dialog">
+			  	<div class="modal-header">
+			    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			    	<h3>Oh no!</h3>
+			  	</div>
+			  	<div id='error-message-container' class="modal-body"></div>
+			  	<div class="modal-footer">
+			    	<button class="btn btn-primary" data-dismiss="modal">Close</button>
+			  	</div>
+			</div>
+			
+			<div id="stat-modal" class="modal hide fade wider" tabindex="-1" role="dialog">
+			  	<div class="modal-header">
+			    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+			    	<h3>Statistics</h3>
+			  	</div>
+			  	<ul class="nav nav-tabs" id="chart-tab">
+					<li id='total-score-tab' class="active"><a data-target="#total-score-chart">Total Score</a></li>
+					<li id='score-by-round-tab'><a data-target="#score-by-round-chart">Score by Round</a></li>
+					<li id='bid-tab'><a data-target="#bid-chart">Bid</a></li>
+					<li id='miscellaneous-tab'><a data-target="#miscellaneous-chart">Miscellaneous</a></li>
+				</ul>
+				<div class="tab-content">
+				  	<div class="tab-pane active" id="total-score-chart"></div>
+				  	<div class="tab-pane" id="score-by-round-chart"></div>
+				  	<div class="tab-pane" id="bid-chart">
+				  		<div id="bid-chart-1"></div>
+				  		<div id="bid-chart-2"></div>
+				  		<div id="bid-chart-3"></div>
+				  	</div>
+				  	<div class="tab-pane" id="miscellaneous-chart"></div>
+				</div>
+				<div class="modal-footer">
+			    	<button class="btn btn-primary" data-dismiss="modal">Close</button>
+			  	</div>
+			</div>
+			
+			<!-- contains templates that are used and inserted dynamically -->
+			<div id='templates' style='display: none;'>				
+				<div class='row round'>
+					<div class='span4'>
+						<i class='icon-remove-circle remove-button'></i>
+						<div class='editable score left'>0</div>
+					</div>
+					<div class='span4'>
+						<div class='bid-container'>
+							<i class='icon-circle-arrow-left active left'></i>
+							<div class='editable score bid' style='display: inline;'>130</div>
+							<i class='icon-circle-arrow-right right'></i>
+						</div>
+					</div>
+					<div class='span4'><div class='editable score right'>0</div></div>
+				</div>
+			</div>
+			
+		</div>		
+	</body>
+</html>
